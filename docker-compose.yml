@@ -1,5 +1,6 @@
 version: '3.8'
 services:
+<<<<<<< HEAD
   db1:
     image: mysql:8.0
     restart: always
@@ -13,6 +14,8 @@ services:
     ports:
       - "3306:3306"  # Exposing db1 on 3306 for internal use
 
+=======
+>>>>>>> messed-up-with-databases-need-to-go-back
   db2:
     image: mysql:8.0
     restart: always
@@ -24,7 +27,11 @@ services:
     volumes:
       - mysql_data2:/var/lib/mysql
     ports:
+<<<<<<< HEAD
       - "3307:3306"  # Exposing db2 on 3307 for internal use
+=======
+      - "3306:3306"
+>>>>>>> messed-up-with-databases-need-to-go-back
 
   db3:
     image: mysql:8.0
@@ -37,6 +44,7 @@ services:
     volumes:
       - mysql_data3:/var/lib/mysql
     ports:
+<<<<<<< HEAD
       - "3308:3306"  # Exposing db3 on 3308 for internal use
 
   backend:
@@ -76,12 +84,53 @@ services:
       dockerfile: Dockerfile
     volumes:
       - ./frontend:/app
+=======
+      - "3307:3306"
+
+  backend:
+    build:
+      context: ./Backend  # Changed to Backend folder
+      dockerfile: Dockerfile
+    volumes:
+      - ./Backend:/app  # Changed to Backend folder
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db2
+      - db3
+    environment:
+      DB2_HOST: db2
+      DB2_PORT: 3306
+      DB2_USER: mysqluser
+      DB2_PASSWORD: secret1234
+      DB3_HOST: db3
+      DB3_PORT: 3306
+      DB3_USER: mysqluser
+      DB3_PASSWORD: secret1234
+      DJANGO_SETTINGS_MODULE: Backend.settings
+      SECRET_KEY: iratash
+      DEBUG: 'True'
+
+  frontend:
+    build:
+      context: ./Frontend  # Changed to Frontend folder
+      dockerfile: Dockerfile
+    volumes:
+      - ./Frontend:/app  # Changed to Frontend folder
+      - ./static_data:/app/staticfiles
+>>>>>>> messed-up-with-databases-need-to-go-back
     ports:
       - "80:80"
     depends_on:
       - backend
 
 volumes:
+<<<<<<< HEAD
   mysql_data1:
   mysql_data2:
   mysql_data3:
+=======
+  mysql_data2:
+  mysql_data3:
+  static_data:
+>>>>>>> messed-up-with-databases-need-to-go-back

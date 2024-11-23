@@ -1,6 +1,5 @@
-from rest_framework import generics, status
+from rest_framework import status
 from rest_framework.response import Response
-from rest_framework.views import APIView
 from django.contrib.auth.models import User
 from django.core.mail import EmailMessage
 from django.utils.encoding import force_bytes, force_str
@@ -10,7 +9,6 @@ from django.template.loader import render_to_string
 from django.http import JsonResponse, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib import messages
-from .serializers import RegisterSerializer
 from django.core.mail import get_connection, EmailMessage
 import json, smtplib
 from django.contrib.auth import login, logout
@@ -22,8 +20,6 @@ from django.contrib.auth import get_user_model
 from django.utils.encoding import force_str 
 from django.views.decorators.csrf import csrf_protect
 from django.contrib.auth import authenticate
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.decorators import permission_classes
 
 def activate_email(request, user, to_email):
     try:
@@ -38,7 +34,7 @@ def activate_email(request, user, to_email):
         return False
 
     mail_subject = 'Activate your user account'
-    domain = 'http://127.0.0.1:8080'
+    domain = 'http://0.0.0.0:8080'
     message = render_to_string('activation_email.html', {
         'user': user.username,
         'domain': domain,
@@ -51,8 +47,8 @@ def activate_email(request, user, to_email):
     try:
         connection = get_connection()
         email.connection = connection
-        
-        if email.send():
+    
+        if email.send(fail_silently=False):
             messages.success(request, 'Please confirm your email address to complete the registration')
             return True
         else:
@@ -69,8 +65,6 @@ def check_authentication_status(request):
         "is_authenticated": request.user.is_authenticated,
         "user": request.user.username if request.user.is_authenticated else None
     }, status=200)
-
-
 
 @csrf_exempt
 def register(request):
@@ -167,9 +161,6 @@ def login_user(request):
     else:
         return JsonResponse({'success': False, 'message': 'Invalid email or password.'}, status=status.HTTP_401_UNAUTHORIZED)
 
-
-    
-# Fix the logout function
 @csrf_protect
 @api_view(['POST'])
 def logout_user(request):
